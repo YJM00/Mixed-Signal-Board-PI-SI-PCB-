@@ -1,9 +1,5 @@
 # STM32 Mixed-Signal Controller Board Design Project
 
-> STM32 기반의 Mixed-Signal Embedded Controller Board를 설계한 프로젝트입니다.  
-> Requirement Sheet 분석부터 부품 선정, Power Budget 산출, Main Controller MCU 및 Debugger MCU 회로 설계, Ethernet PHY / Motor Driver / ADC·DAC·MIC / LDO 설계, Mixed-Signal PCB Layout, 3D Viewer 검토까지 전체 흐름을 정리했습니다.
-
----
 
 ## 프로젝트 개요
 
@@ -256,10 +252,10 @@ LDO 블록은 아날로그 회로와 민감한 신호 블록에 안정적이고 
 - 외부 클럭 사용을 위한 외부 크리스탈 로드캡 
 ---
 
-## 11. Mixed-Signal PCB Layout 설계
+## 11. Mixed-Signal PCB Artwork 설계
 
-PCB Layout 단계에서는 단순 연결이 아니라,  
-**SI / PI / Return Path / EMI / Mixed-Signal Partitioning**을 종합적으로 고려했습니다.
+PCB Artwork 단계에서는 단순 연결이 아니라,  
+**SI / PI / Return Path / EMI / Mixed-Signal**을 종합적으로 고려했습니다.
 
 ### 주요 설계 목표
 
@@ -281,25 +277,25 @@ PCB Layout 단계에서는 단순 연결이 아니라,
 #### 2) Analog / Digital 분리
 - ADC / DAC / MIC 등 민감한 블록은 디지털 스위칭 영역과 물리적으로 분리
 - 아날로그 전원은 LDO 기반으로 공급
-- GND를 무조건 쪼개기보다, 실제 전류 경로를 고려한 구조 지향
 
 #### 3) Power Integrity
 - 각 IC 전원핀 근처 Decoupling Capacitor 배치
 - 전원 유입부와 부하 변화가 큰 영역에 Bulk Capacitor 배치
-- 전원 레일은 Plane 또는 넓은 Copper로 안정적 분배
+- 전원레일은 직접 선으로 연결x Power plane을 거쳐서 전원 분배
 
 #### 4) EMI / Protection
 - 외부 커넥터 근처 보호소자 우선 배치
 - Ferrite Bead를 통한 고주파 노이즈 분리
-- 필요 시 Via Stitching으로 Ground 연속성 강화
+ 
+#### 5) Via Stitching
+- 리턴전류의 지름길을 제공하여 짧을 리턴패스 제공
+- GND와 GND PLANE POWER와 POWER PLANE을 연결하여 안정성 제공
 
-#### 5) Differential / High-Speed Signal
-- 차동 Pair는 길이 차이와 간격을 고려하여 Routing
-- 규정 임피던스를 목표로 Stack-up, 폭, 간격을 조정하는 방향으로 설계
-- Layer 변경은 최소화
-- Layer 변경 시 GND Via를 통한 Return Path 보강 검토
+#### 6) Differential / High-Speed Signal
+- 고속신호의 규정임피던스를 준수
+- 규정 임피던스에 맞게 트레이스 폭/넓이, 차동선 사이 간격, plane 간격, PCB재료의 유전율 
 
-#### 6) Mounting Hole / Shield / Chassis 고려
+#### 7) Mounting Hole / Shield / Chassis 고려
 - 마운팅홀을 시스템 Ground 또는 Chassis/Earth 전략과 연계 검토
 - 실드/케이스와 연결될 경우 ESD 및 고주파 노이즈 방출 경로를 고려한 구조 검토
 
