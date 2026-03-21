@@ -318,57 +318,6 @@ PCB Artwork 단계에서는 단순 연결이 아니라,
   <img width="701" height="702" alt="image" src="https://github.com/user-attachments/assets/0655c049-84ff-4f70-9bd2-adc593d9f064" />
 </p>
 
-
-
 ---
 
-## 프로젝트를 통해 학습한 핵심 내용
 
-### System-level HW 설계
-- Requirement를 HW 설계 항목으로 변환하는 방법
-- 기능 블록 단위의 시스템 보드 구성
-
-### 부품 선정 및 데이터시트 해석
-- MCU / PHY / MOSFET / LDO / 보호소자 선정 기준
-- Functional Block Diagram / Electrical Characteristics / Pinout 중심 데이터시트 분석
-
-### 전원 설계
-- Power Budget 산출
-- Power Tree 구성
-- Bulk / Decoupling Capacitor 역할 구분
-- 저노이즈 전원 설계 방향 이해
-
-### Mixed-Signal PCB 설계
-- Analog / Digital 분리
-- Ground / Return Path 설계
-- Differential Pair 및 고속 신호 고려
-- ESD / EMI 대응용 부품 배치 전략
-
-### 제조 지향 설계
-- Schematic → PCB Layout → 3D Viewer → Gerber / BOM으로 이어지는 흐름 경험
-
----
-
-## 사용 기술 및 키워드
-
-`STM32` `Main MCU` `Debugger MCU` `Schematic Design` `Power Budget` `Power Tree` `Ethernet PHY` `Motor Driver` `MOSFET` `ADC` `DAC` `MIC` `LDO` `Mixed-Signal PCB` `Ground Plane` `Power Plane` `Return Path` `Differential Pair` `Impedance Control` `TVS` `Ferrite Bead` `ESD` `EMI` `Thermal Via` `3D Viewer` `Gerber` `BOM`
-
----
-
-## 폴더 구조 예시
-
-```bash
-STM32-Mixed-Signal-Controller-Board/
-├─ README.md
-├─ docs/
-│  ├─ images/
-│  │  ├─ main_mcu_schematic.png
-│  │  ├─ pcb_layout_final.png
-│  │  └─ board_3d_view.png
-│  ├─ reports/
-│  ├─ datasheets/
-│  └─ bom/
-├─ schematic/
-├─ pcb/
-├─ gerber/
-└─ bom/
