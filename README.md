@@ -1,357 +1,398 @@
 # STM32 Mixed-Signal Controller Board Design Project
 
-> STM32 기반의 Mixed-Signal Embedded Controller Board를 직접 기획하고,  
-> Requirement 분석부터 부품 선정, Schematic 설계, PCB Layout, 3D 검토, 제조 산출물 준비까지 수행한 HW 설계 프로젝트입니다.
+> STM32 기반의 Mixed-Signal Embedded Controller Board를 설계한 프로젝트입니다.  
+> Requirement Sheet 분석부터 부품 선정, Power Budget 산출, Main Controller MCU 및 Debugger MCU 회로 설계, Ethernet PHY / Motor Driver / ADC·DAC·MIC / LDO 설계, Mixed-Signal PCB Layout, 3D Viewer 검토까지 전체 흐름을 정리했습니다.
 
 ---
 
 ## 프로젝트 개요
 
-이 프로젝트는 STM32를 메인 MCU로 사용하는 임베디드 시스템 보드를 설계하는 과정에서,  
-단순 MCU 최소회로 수준이 아니라 **전원부, Ethernet PHY, Motor Driver, ADC/DAC, MIC, LDO, ESD/EMI 보호회로, Mixed-Signal PCB Layout**까지 통합적으로 고려하여 설계한 프로젝트입니다.
+이 프로젝트는 단순한 STM32 최소 시스템 보드 설계를 넘어서,  
+**메인 제어용 MCU와 디버깅용 MCU를 포함한 시스템 수준의 보드 설계**를 목표로 진행한 프로젝트입니다.
 
-특히 다음과 같은 실무형 설계 흐름을 중심으로 진행했습니다.
+보드에는 다음과 같은 주요 블록이 포함됩니다.
 
-- System-level Requirement 분석
-- STM32 MCU 및 주변 부품 선정
-- Power Budget 및 Power Tree 설계
-- Ethernet PHY / 보호회로 설계
-- Motor Driver / MOSFET 설계
-- ADC / DAC / MIC / LDO 아날로그 회로 설계
-- Mixed-Signal PCB Layout 설계
-- 3D Board Viewer를 통한 실장 구조 검토
-- Gerber / BOM 등 제조용 산출물 준비
+- **Main Controller MCU**
+- **Debugger MCU**
+- **Power Tree / Power Budget**
+- **Ethernet PHY**
+- **Motor Driver / MOSFET**
+- **ADC / DAC / MIC 아날로그 인터페이스**
+- **LDO 기반 저노이즈 전원부**
+- **Mixed-Signal PCB Layout**
+- **ESD / EMI / Return Path / Ground Structure 고려**
+
+즉, 이 프로젝트는 단순 회로 작성이 아니라  
+**System-level Requirement를 기반으로 실제 제작 가능한 형태의 STM32 Mixed-Signal 보드를 설계한 HW 설계 프로젝트**입니다.
 
 ---
 
 ## 프로젝트 목표
 
 - STM32 기반 메인 컨트롤 보드 설계 경험 확보
-- Mixed-Signal 시스템에서의 전원/접지/리턴패스 설계 이해
-- 데이터시트 기반 부품 선정 및 회로 설계 능력 강화
-- Ethernet, Motor, Analog 블록이 공존하는 PCB 설계 경험 축적
-- 실제 제작 가능한 수준의 PCB 아트웍 및 산출물 정리
+- Main Controller MCU와 Debugger MCU를 포함한 시스템 구조 이해
+- Requirement Sheet를 바탕으로 실제 부품 선정 및 회로 설계 수행
+- Power Budget 및 Power Tree 설계 경험 확보
+- Ethernet / Motor / Analog / Power 블록이 공존하는 Mixed-Signal 보드 설계 경험 축적
+- PCB Layout과 3D Viewer 검토까지 포함한 제조 지향 설계 흐름 정리
 
 ---
 
-## 개발 기간
+## 개발 환경
 
-- 진행 기간: `YYYY.MM ~ YYYY.MM`
-- 설계 툴: `KiCad / Altium Designer / 기타 사용 툴명`
-- 대상 MCU: `STM32Fxxx / STM32Hxxx / STM32 시리즈명 기입`
-
----
-
-## 프로젝트 핵심 역량
-
-- **STM32 MCU Schematic 설계**
-- **Power Budget / Power Tree 설계**
-- **Ethernet PHY 및 ESD/EMI 대응 설계**
-- **Motor Driver / MOSFET 회로 설계**
-- **ADC / DAC / MIC / LDO 아날로그 회로 설계**
-- **Mixed-Signal PCB Layout**
-- **Power Plane / Ground Plane / Return Path 고려**
-- **Differential Pair / Impedance / Noise Suppression 기초 적용**
-- **3D Viewer 기반 기구 간섭 및 실장성 검토**
-- **Gerber / BOM 등 제조 산출물 정리**
-
----
-
-## System Architecture
-
-이 보드는 STM32 MCU를 중심으로, 디지털 통신부와 아날로그 신호처리부, 전원부, 보호회로, 모터 구동부를 하나의 시스템으로 통합하는 것을 목표로 설계했습니다.
-
-주요 블록은 다음과 같습니다.
-
-- **Main MCU Block**
-  - STM32 Core
-  - Clock Tree
-  - Reset / Boot Configuration
-  - Debug Interface (SWD / JTAG)
-
-- **Power Block**
-  - 입력 전원
-  - DC-DC / LDO 기반 전원 분배
-  - Bulk Capacitor / Decoupling Capacitor 배치
-  - Analog / Digital 전원 품질 고려
-
-- **Communication Block**
-  - Ethernet PHY
-  - RMII / MII 인터페이스 고려
-  - RJ45 연결 및 ESD/EMI 보호
-
-- **Motor Control Block**
-  - Motor Driver / MOSFET / H-Bridge 구조 고려
-  - Load Current, Gate Drive, Switching 특성 검토
-
-- **Analog Front-End Block**
-  - ADC / DAC / MIC 인터페이스
-  - LDO를 활용한 저노이즈 전원 공급
-  - 아날로그 신호 품질 확보를 위한 Layout 분리
+- **설계 툴**: `KiCad / Altium Designer / 기타 사용 툴명`
+- **Main MCU**: `STM32Fxxx / STM32Hxxx / 사용 MCU 기입`
+- **Debugger MCU**: `STM32F103 / ST-LINK 계열 / 사용 MCU 기입`
+- **프로젝트 기간**: `YYYY.MM ~ YYYY.MM`
 
 ---
 
 ## 전체 설계 흐름
 
-### 1. Requirement Sheet 분석
-프로젝트 초기에 보드에 필요한 기능, 인터페이스, 전원 레일, 통신 방식, 보호회로 요구사항 등을 정리했습니다.
-
-검토 항목 예시:
-- MCU 성능 및 필요한 Peripheral
-- Ethernet 지원 여부
-- ADC / DAC / MIC 인터페이스 필요성
-- Motor 구동 회로 포함 여부
-- 입력 전압 및 전원 레일 구성
-- EMI / ESD 대응 필요성
-- PCB Layer 수 및 Stack-up 방향성
+1. Requirement Sheet 분석  
+2. 최종 선정 부품 정리  
+3. Power Budget 및 Power Tree 설계  
+4. Debugger MCU 설계  
+5. Ethernet PHY 설계  
+6. Motor Driver 설계  
+7. ADC / DAC / MIC 설계  
+8. LDO 설계  
+9. Mixed-Signal PCB Layout 설계  
 
 ---
 
-### 2. MCU 및 주요 부품 선정
-STM32 시리즈를 검토하면서 Core 성능, Flash/RAM, Peripheral Interface, Clock Tree Architecture를 기준으로 적절한 MCU를 선택했습니다.
+## 1. Requirement Sheet 분석
 
-또한 아래와 같은 방식으로 부품을 선정했습니다.
+프로젝트 초기에 시스템 요구사항을 정리하고, 이를 회로 및 PCB 설계 항목으로 변환하는 과정을 먼저 진행했습니다.
 
-- **STM32 MCU**
-  - 필요한 Peripheral 충족 여부
-  - UART / SPI / I2C / ADC / DAC / Ethernet 지원 여부
-  - 패키지 / 핀 수 / 확장성 고려
+주요 분석 항목은 다음과 같습니다.
+
+- 메인 제어를 위한 MCU 성능 및 Peripheral 요구사항
+- Debugger MCU 필요 여부 및 디버깅 인터페이스 구성
+- Ethernet 통신 필요 여부
+- Motor 제어 회로 포함 여부
+- ADC / DAC / MIC 등 아날로그 블록 필요 여부
+- 입력 전원 조건 및 전원 레일 구성
+- 보호회로(ESD / EMI / Fuse / TVS) 적용 여부
+- PCB Layer 수 및 Mixed-Signal 보드 구조 방향성
+
+### Requirement 관점에서 정리한 핵심 포인트
+
+- **Digital Block**
+  - STM32 기반 메인 제어
+  - Debugger MCU를 통한 다운로드/디버깅
+- **Communication Block**
+  - Ethernet PHY 기반 유선 통신 확장
+- **Power Block**
+  - 입력 전원에서 여러 전원 레일로 안정적 분배
+- **Actuator Block**
+  - Motor Driver / MOSFET 기반 구동
+- **Analog Block**
+  - ADC / DAC / MIC 인터페이스
+- **PCB Block**
+  - Mixed-Signal 보드로서 전원/접지/리턴패스/노이즈 고려
+
+---
+
+## 2. 최종 선정 부품
+
+Requirement를 바탕으로 각 기능 블록에 필요한 주요 부품을 선정했습니다.  
+선정 시에는 데이터시트의 Functional Block Diagram, Electrical Characteristics, Recommended Operating Conditions, Application Circuit 등을 중점적으로 참고했습니다.
+
+### 주요 선정 부품 범주
+
+- **Main Controller MCU**
+  - Core 성능
+  - Flash / RAM
+  - Peripheral (UART, SPI, I2C, ADC, DAC, Ethernet 등)
+  - 패키지 / 핀 수 / 확장성
+
+- **Debugger MCU**
+  - SWD / JTAG 기반 디버깅 연결
+  - Main MCU 다운로드 및 디버그 지원
+  - 보드 Bring-up 편의성
 
 - **Ethernet PHY**
   - Link Speed
-  - MCU 인터페이스 호환성
-  - 주변 저항/트랜스/ESD 부품 구성 가능성
+  - Main MCU와의 인터페이스 호환성
+  - 주변 수동소자 구성 가능성
 
 - **Motor Driver / MOSFET**
-  - 구동 전류
+  - 허용 전류
   - Switching 특성
-  - 발열 및 Thermal 고려
+  - Gate Drive 조건
+  - 발열 및 Thermal 대응
 
-- **ADC / DAC / MIC / LDO**
-  - Resolution / Sampling 특성
-  - 저노이즈 전원 품질
-  - PSRR / Ripple / Dropout 특성 고려
+- **ADC / DAC / MIC**
+  - Resolution / Sampling
+  - 주파수 응답
+  - 아날로그 신호 품질
 
----
+- **LDO**
+  - Dropout Voltage
+  - Output Current
+  - PSRR
+  - Noise / Ripple 특성
 
-## 데이터시트 분석 포인트
-
-이 프로젝트에서는 단순히 부품만 선택하는 것이 아니라, 데이터시트를 읽고 설계에 직접 반영하는 과정을 중요하게 다뤘습니다.
-
-중점적으로 분석한 항목:
-- Functional Block Diagram
-- Pinout 및 Alternate Function
-- Electrical Characteristics
-- Absolute Maximum Ratings
-- Timing Diagram
-- Recommended Operating Conditions
-- Typical Application Circuit
-- Layout Guideline
-- Power Supply Decoupling Requirement
-
-이를 통해 단순 연결이 아니라, **부품의 동작 조건과 한계를 이해한 상태에서 회로를 설계**하려고 했습니다.
+- **Protection Components**
+  - TVS Diode
+  - Ferrite Bead
+  - Fuse
+  - ESD / EMI 대응용 부품
 
 ---
 
-## Power Budget 및 Power Tree 설계
+## 3. Power Budget 및 Power Tree 설계
 
-전원 설계는 시스템 안정성과 직결되므로, 각 블록의 전력 소모를 추정하고 Power Tree를 구성하는 방식으로 접근했습니다.
+전체 시스템의 안정성을 확보하기 위해 각 블록의 소비 전력을 가정/분석하고, 이를 기반으로 Power Budget과 Power Tree를 구성했습니다.
 
-주요 고려 사항:
+### 주요 고려 항목
+
 - 입력 전원 조건 정의
-- 각 전원 레일 분리
-- DC-DC / LDO 역할 분담
-- Bulk Capacitor와 Decoupling Capacitor 배치
-- Analog / Digital 전원 간 간섭 최소화
-- 부하 변동에 따른 전압 안정성 확보
+- Main MCU / Debugger MCU 전원 분리 여부
+- Ethernet PHY 전원 요구사항
+- Motor Driver 전원 요구사항
+- ADC / DAC / MIC 아날로그 전원 품질
+- LDO와 DC-DC의 역할 분담
+- 각 전원 레일별 디커플링 및 벌크 캐패시터 배치
 
-### 설계 시 고려한 포인트
+### 설계 시 반영한 포인트
+
 - **Bulk Capacitor**
-  - 저주파 리플 및 순간 부하 대응
+  - 순간 부하 변화 대응
+  - 저주파 리플 완화
+
 - **Decoupling Capacitor**
   - 고주파 전류 루프 최소화
-  - IC 전원핀 근처 배치
-- **LDO**
-  - 아날로그 회로용 저노이즈 전원 확보
-- **Ferrite Bead**
-  - 고주파 노이즈 격리
-- **Power Plane**
-  - 각 전원 레일을 안정적으로 분배하기 위한 구조 고려
+  - IC 전원핀 근접 배치
+
+- **Power Plane / Wide Copper**
+  - 전원 분배 안정성 확보
+  - 고전류 라인의 전압 강하 최소화
+
+- **Analog / Digital Power 분리**
+  - 민감한 아날로그 회로에 저노이즈 전원 공급
+  - 디지털 스위칭 노이즈 간섭 저감
 
 ---
 
-## Ethernet PHY / ESD / EMI 대응 설계
+## 4. Debugger MCU 설계
 
-Ethernet 블록은 외부 커넥터를 통해 신호가 들어오므로, 단순 통신 연결뿐 아니라 **ESD/EMI 대응 설계**가 매우 중요했습니다.
+이 보드는 메인 제어용 MCU 외에도,  
+다운로드 및 디버깅을 위한 **Debugger MCU** 구조를 포함하도록 설계했습니다.
 
-주요 설계 내용:
-- Ethernet PHY 인터페이스 검토
-- PHY 주변 매칭 저항 구성
-- RJ45 연결 구조 고려
-- TVS 다이오드 적용
-- Ferrite Bead / EMI 필터링 구조 검토
-- Ground 및 Return Path 고려
-- 고속 신호의 품질 유지를 위한 배치/배선 방향성 검토
+Debugger MCU 블록은 다음과 같은 목적을 갖습니다.
+
+- Main MCU 프로그램 다운로드
+- 디버깅 인터페이스 제공
+- 개발 단계에서의 Bring-up 편의성 향상
+- 보드 단독 디버그 환경 구성
+
+### 주요 설계 항목
+
+- SWD / JTAG 연결 구조
+- Reset 및 Boot 관련 제어
+- Main MCU와의 디버그 인터페이스 연결
+- 전원 공급 및 디커플링
+- 디버그 커넥터 연결 구조
+
+### 설계 포인트
+
+- 메인 MCU와 디버거 MCU 간 신호 연결을 명확히 분리
+- 디버그 라인의 길이와 배치를 과도하게 복잡하게 만들지 않도록 구성
+- 디버깅 중 Main MCU 전원 안정성이 깨지지 않도록 전원 구조 고려
+- Bring-up 단계에서 접근이 쉽도록 디버그 포트 위치 고려
+
+---
+
+## 5. Ethernet PHY 설계
+
+Ethernet 블록은 외부와 연결되는 대표적인 고속 통신 블록이므로,  
+신호 연결뿐 아니라 **보호회로, 노이즈 억제, 리턴패스, 배치 전략**까지 함께 고려했습니다.
+
+### 주요 설계 항목
+
+- Main MCU와 Ethernet PHY 인터페이스 구조
+- PHY 주변 저항 및 기본 수동소자 구성
+- RJ45 연결 방향성
+- ESD / EMI 보호회로 적용
+- 고속 신호 Routing 고려
 
 ### 중점 설계 포인트
-- 외부 노출 단자 근처에 보호소자 우선 배치
-- 고속 신호는 불필요한 굴곡 및 Stub 최소화
-- 차동 신호는 Pair 형태로 가깝게 Routing
-- 리턴패스가 끊기지 않도록 Ground 구조 고려
+
+- 외부 커넥터 근처에 TVS 등 보호소자 우선 배치
+- 불필요한 Stub와 과도한 굴곡 최소화
+- 차동 신호는 Pair 형태로 인접 Routing
+- Return Path가 끊기지 않도록 Ground 참조면 유지
+- PHY와 RJ45 사이의 배치를 단순하고 짧게 유지하도록 고려
 
 ---
 
-## Motor Driver / MOSFET 설계
+## 6. Motor Driver 설계
 
-Motor 관련 회로는 일반 디지털 회로보다 전류 소모가 크고 스위칭 시 노이즈와 발열이 크므로 별도로 주의하여 설계했습니다.
+Motor Driver 블록은 상대적으로 큰 전류와 스위칭 노이즈를 다루므로,  
+디지털 제어 회로와는 다른 관점에서 설계했습니다.
 
-주요 검토 항목:
+### 주요 설계 항목
+
 - Load Current
-- MOSFET의 Switching 특성
-- Body Diode 영향
-- Gate Drive Voltage
-- 발열 및 Thermal Path
-- Heat Sink / Thermal Pad 고려
+- MOSFET / Driver 소자 선택
+- Switching 특성
+- Gate Drive 조건
+- 발열 및 Thermal 대응
+- 고전류 경로 Routing
 
 ### 설계 포인트
-- 고전류 경로는 넓은 패턴으로 설계
-- 전력 Loop를 짧게 유지
-- Switching Noise가 아날로그 영역으로 전파되지 않도록 분리
-- Thermal Via, Copper Area 확보 고려
+
+- 고전류 경로는 가능한 넓은 패턴으로 설계
+- Switching Loop 면적 최소화
+- Digital / Analog 영역으로 노이즈가 전파되지 않도록 배치 분리
+- Thermal Pad / Thermal Via / Copper Area 확보를 고려
+- Motor 구동 전류와 제어 신호 Routing을 구분하여 설계
 
 ---
 
-## ADC / DAC / MIC / LDO 설계
+## 7. ADC / DAC / MIC 설계
 
-이 보드는 단순 디지털 제어 보드가 아니라, 아날로그 신호 처리까지 포함하는 Mixed-Signal 시스템을 목표로 했습니다.
+이 보드는 디지털 제어뿐 아니라 아날로그 신호 처리 블록도 포함하므로,  
+ADC / DAC / MIC 회로는 신호 품질 중심으로 설계했습니다.
 
-그래서 ADC / DAC / MIC / LDO 설계 시 다음 내용을 중점적으로 반영했습니다.
+### 주요 설계 항목
 
-- ADC Resolution / Sampling Rate 고려
-- DAC 출력 품질 고려
-- 마이크 입력 신호 품질 확보
-- 아날로그 전원 노이즈 최소화
-- LDO를 통한 깨끗한 전원 공급
-- 아날로그 Ground와 디지털 Switching Noise 간섭 최소화
+- ADC Resolution 및 입력 신호 경로
+- DAC 출력 품질
+- MIC 입력 신호 처리
+- 민감 신호와 스위칭 노이즈 분리
+- 아날로그 회로 전원 품질 확보
 
 ### 설계 포인트
-- 아날로그 블록은 디지털 고속 스위칭 영역과 물리적으로 분리
-- LDO 출력단 및 입력단 캐패시터 조건 반영
-- ADC 입력 라인은 가능한 짧고 깨끗하게 배치
-- 민감한 신호는 Return Path가 안정적인 영역 위로 Routing
+
+- ADC 입력 라인은 가능한 짧고 깨끗하게 유지
+- DAC 및 MIC 관련 라인은 디지털 스위칭 영역과 물리적으로 분리
+- 아날로그 블록 아래 참조 GND의 연속성 확보
+- 리턴패스를 고려하여 민감 신호가 불연속한 참조면 위를 지나지 않도록 배치
+- 아날로그 입력부는 외부 노이즈 유입 경로를 최소화하도록 구성
 
 ---
 
-## Schematic 설계
+## 8. LDO 설계
 
-전체 Schematic은 기능 블록 단위로 구성했습니다.
+LDO 블록은 아날로그 회로와 민감한 신호 블록에 안정적이고 깨끗한 전원을 공급하기 위해 설계했습니다.
 
-예시 블록:
-- Main MCU Block
-- Power Input / Regulation Block
-- Ethernet PHY Block
-- Motor Driver Block
-- ADC / DAC / MIC Block
-- Protection Block
-- Debug / Programming Block
+### 주요 설계 항목
 
-설계 시 중요하게 본 항목:
-- Power Tree와 Signal Tree를 명확히 분리
-- Clock, Reset, Boot, Debug 회로의 안정성 확보
-- TVS, Fuse, Ferrite Bead 등 보호 부품 위치 고려
-- 회로도 단계에서부터 PCB Layout까지 연결되는 구조를 염두에 둔 Net 구성
+- 입력 전압과 출력 전압 조건
+- Dropout Voltage
+- Output Current
+- PSRR
+- Output Ripple / Noise
+- 데이터시트 권장 입출력 캐패시터 조건
+
+### 설계 포인트
+
+- ADC / DAC / MIC 등 민감한 블록에 저노이즈 전원 공급
+- LDO 입력단과 출력단 캐패시터를 데이터시트 권장 조건에 맞게 배치
+- LDO 출력 전원은 디지털 고전류 스위칭 경로와 분리
+- 전원 품질이 중요한 블록 근처에 배치하여 경로를 짧게 유지
 
 ---
 
-## 메인 MCU 회로도
+## Main MCU Schematic
 
+이 프로젝트의 메인 제어부는 **Main Controller MCU + Debugger MCU** 구조를 갖도록 설계했습니다.  
 아래에는 메인 MCU 중심 회로도 이미지를 삽입할 예정입니다.
 
-> 파일 경로 예시: `docs/images/main_mcu_schematic.png`
+> 이미지 파일 예시 경로: `docs/images/main_mcu_schematic.png`
 
 <p align="center">
-  <img src="docs/images/main_mcu_schematic.png" width="850">
+  <img src="docs/images/main_mcu_schematic.png" width="900">
 </p>
 
 <p align="center">
-  <sub>Main MCU schematic (STM32 core, clock, reset, debug, power decoupling)</sub>
+  <sub>Main MCU schematic including core power, clock, reset, boot, debug interface, and peripheral connections</sub>
 </p>
 
 ---
 
-## PCB Layout 설계
+## 9. Mixed-Signal PCB Layout 설계
 
-PCB Layout은 단순 배선이 아니라, **전원 무결성(PI), 신호 무결성(SI), 리턴패스, EMI/EMC 대응, Mixed-Signal 분리**를 고려하여 설계했습니다.
+PCB Layout 단계에서는 단순 연결이 아니라,  
+**SI / PI / Return Path / EMI / Mixed-Signal Partitioning**을 종합적으로 고려했습니다.
 
-주요 적용 내용:
-- Multi-layer PCB 구조 고려
-- Ground Plane / Power Plane 분리
-- Analog / Digital 영역 분리
-- Decoupling loop 최소화
-- 고전류 / 고속신호 / 민감신호 Routing 분리
-- Differential Pair Routing 기초 적용
-- Thermal Via 및 발열 경로 고려
-- Mounting Hole 및 시스템 Ground/Shield 연결 방향 검토
+### 주요 설계 목표
+
+- Digital / Analog / Power / Motor 영역의 분리
+- Ground Plane / Power Plane 구조 최적화
+- 리턴 전류 경로 안정화
+- 디커플링 루프 최소화
+- 민감 신호와 고전류/고속 신호 분리
+- 고속 차동 신호의 참조면 연속성 확보
+- 제조 가능성과 조립성을 고려한 부품 배치
 
 ### Layout 설계 포인트
 
 #### 1) Ground / Return Path
-- 신호 아래에 연속적인 Ground 참조면 확보
+- 신호 아래 연속적인 Ground 참조면 확보
 - 리턴 전류가 멀리 우회하지 않도록 배치
-- 고속/고주파 신호의 loop area 최소화
+- 고속/고주파 신호의 Loop Area 최소화
 
 #### 2) Analog / Digital 분리
-- ADC, DAC, MIC 등 아날로그 블록은 디지털 스위칭 영역과 분리
-- 아날로그 전원은 LDO 기반으로 안정성 확보
-- Ground 분리 시 불필요한 분단이 아니라, 전류 경로를 고려한 구조 지향
+- ADC / DAC / MIC 등 민감한 블록은 디지털 스위칭 영역과 물리적으로 분리
+- 아날로그 전원은 LDO 기반으로 공급
+- GND를 무조건 쪼개기보다, 실제 전류 경로를 고려한 구조 지향
 
 #### 3) Power Integrity
-- IC 전원핀 근처 Decoupling Capacitor 배치
-- Bulk Capacitor는 전원 유입부 및 부하 변화가 큰 지점에 배치
-- 전원 레일별 Plane 혹은 넓은 Copper 영역 활용
+- 각 IC 전원핀 근처 Decoupling Capacitor 배치
+- 전원 유입부와 부하 변화가 큰 영역에 Bulk Capacitor 배치
+- 전원 레일은 Plane 또는 넓은 Copper로 안정적 분배
 
-#### 4) Protection / EMI
-- 외부 커넥터 근처에 TVS 우선 배치
-- Ferrite Bead로 노이즈 분리
-- 필요 시 Via Stitching을 통해 Ground 연속성 강화
+#### 4) EMI / Protection
+- 외부 커넥터 근처 보호소자 우선 배치
+- Ferrite Bead를 통한 고주파 노이즈 분리
+- 필요 시 Via Stitching으로 Ground 연속성 강화
 
 #### 5) Differential / High-Speed Signal
-- 차동 Pair는 길이 차이, 간격, 참조면 연속성을 고려
-- 규정 임피던스를 목표로 Stack-up과 폭/간격을 조정하는 방향으로 설계
-- 불필요한 Layer 변경 최소화
-- Layer 변경 시 Return Path 연속성을 고려한 GND Via 보강 검토
+- 차동 Pair는 길이 차이와 간격을 고려하여 Routing
+- 규정 임피던스를 목표로 Stack-up, 폭, 간격을 조정하는 방향으로 설계
+- Layer 변경은 최소화
+- Layer 변경 시 GND Via를 통한 Return Path 보강 검토
+
+#### 6) Mounting Hole / Shield / Chassis 고려
+- 마운팅홀을 시스템 Ground 또는 Chassis/Earth 전략과 연계 검토
+- 실드/케이스와 연결될 경우 ESD 및 고주파 노이즈 방출 경로를 고려한 구조 검토
 
 ---
 
-## PCB 아트웍 결과
+## PCB 아트웍 완료 이미지
 
 아래에는 PCB 아트웍 완료 이미지를 삽입할 예정입니다.
 
-> 파일 경로 예시: `docs/images/pcb_layout_final.png`
+> 이미지 파일 예시 경로: `docs/images/pcb_layout_final.png`
 
 <p align="center">
-  <img src="docs/images/pcb_layout_final.png" width="850">
+  <img src="docs/images/pcb_layout_final.png" width="900">
 </p>
 
 <p align="center">
-  <sub>Final PCB artwork (placement, routing, power/ground strategy, mixed-signal partitioning)</sub>
+  <sub>Final PCB artwork showing placement, routing, power distribution, and mixed-signal partitioning</sub>
 </p>
 
 ---
 
 ## 3D Board Viewer 검토
 
-PCB 설계 이후 3D Viewer를 통해 실장 구조를 검토했습니다.
+PCB 설계 이후 3D Viewer를 통해 실제 조립성과 기구적 간섭 가능성을 검토했습니다.
 
-주요 확인 항목:
-- 부품 간 간섭 여부
-- 커넥터 위치 적절성
+### 주요 확인 항목
+
+- 부품 높이 및 간섭 여부
+- 커넥터 방향 및 접근성
 - 기구물과의 Clearance
-- 발열 구조 시각적 검토
-- 조립성 및 생산 전 검토
+- 발열 구조의 시각적 검토
+- 조립 전 부품 배치의 현실성 확인
 
-3D Viewer 단계는 단순 미리보기가 아니라,  
-실제 제작 전에 **배치 실수, 높이 간섭, 커넥터 방향 문제를 줄이는 중요한 검토 과정**으로 활용했습니다.
+3D Viewer 검토는 단순한 미리보기가 아니라,  
+실제 제작 전에 **실장 오류 가능성을 줄이고 Rework 리스크를 낮추기 위한 단계**로 활용했습니다.
 
 ---
 
@@ -359,66 +400,48 @@ PCB 설계 이후 3D Viewer를 통해 실장 구조를 검토했습니다.
 
 아래에는 3D Viewer 기반 완성 보드 이미지를 삽입할 예정입니다.
 
-> 파일 경로 예시: `docs/images/board_3d_view.png`
+> 이미지 파일 예시 경로: `docs/images/board_3d_view.png`
 
 <p align="center">
-  <img src="docs/images/board_3d_view.png" width="850">
+  <img src="docs/images/board_3d_view.png" width="900">
 </p>
 
 <p align="center">
-  <sub>3D board view (component placement, connector orientation, assembly feasibility)</sub>
+  <sub>3D board view for assembly feasibility, component placement validation, and connector orientation check</sub>
 </p>
 
 ---
 
-## 설계 과정에서 중점적으로 학습한 내용
+## 프로젝트를 통해 학습한 핵심 내용
 
-### 1. STM32 MCU 중심 시스템 설계
-- MCU 선정 기준
-- Peripheral 요구사항 분석
-- Clock / Reset / Boot / Debug 회로 구성
-- 데이터시트 기반 설계 흐름
+### System-level HW 설계
+- Requirement를 HW 설계 항목으로 변환하는 방법
+- 기능 블록 단위의 시스템 보드 구성
 
-### 2. 전원 설계
+### 부품 선정 및 데이터시트 해석
+- MCU / PHY / MOSFET / LDO / 보호소자 선정 기준
+- Functional Block Diagram / Electrical Characteristics / Pinout 중심 데이터시트 분석
+
+### 전원 설계
 - Power Budget 산출
-- DC-DC / LDO 역할 분담
-- Bulk / Decoupling Capacitor 활용
-- Power Plane과 전원 분배 구조 이해
+- Power Tree 구성
+- Bulk / Decoupling Capacitor 역할 구분
+- 저노이즈 전원 설계 방향 이해
 
-### 3. 보호회로 설계
-- TVS Diode
-- Fuse
-- Ferrite Bead
-- ESD / EMI 대응 구조
-
-### 4. Mixed-Signal PCB Layout
+### Mixed-Signal PCB 설계
 - Analog / Digital 분리
 - Ground / Return Path 설계
-- Plane 구조 및 Via 활용
-- Noise Suppression과 Signal Integrity 고려
+- Differential Pair 및 고속 신호 고려
+- ESD / EMI 대응용 부품 배치 전략
 
-### 5. 제조 지향 설계
-- Schematic → PCB → 3D 검토 → Gerber/BOM 연결
-- 실제 제작 가능한 산출물 정리 경험
-
----
-
-## 수강 및 프로젝트를 통해 얻은 역량
-
-- 고객/시스템 요구사항을 HW Requirement로 해석하는 능력
-- System-level HW Block Diagram 작성 능력
-- Power Budget 및 Power Tree 설계 기초
-- MCU + Ethernet PHY + Analog + Motor 구동을 하나의 보드로 통합하는 설계 경험
-- ESD/EMI 대응을 위한 TVS, Ferrite Bead, 보호소자 적용 경험
-- ADC/DAC 및 저노이즈 전원 회로 설계 이해
-- 4~6 Layer PCB Stack-up 및 Mixed-Signal 영역 분리 개념 이해
-- PCB 제조를 위한 Gerber / BOM 산출 경험
+### 제조 지향 설계
+- Schematic → PCB Layout → 3D Viewer → Gerber / BOM으로 이어지는 흐름 경험
 
 ---
 
-## 사용 기술 및 설계 키워드
+## 사용 기술 및 키워드
 
-`STM32` `Schematic Design` `PCB Layout` `Mixed-Signal Board` `Ethernet PHY` `Motor Driver` `MOSFET` `ADC` `DAC` `MIC` `LDO` `Power Budget` `Power Tree` `Decoupling Capacitor` `Bulk Capacitor` `TVS` `Ferrite Bead` `ESD` `EMI` `Ground Plane` `Power Plane` `Return Path` `Differential Pair` `Impedance Control` `3D Viewer` `Gerber` `BOM`
+`STM32` `Main MCU` `Debugger MCU` `Schematic Design` `Power Budget` `Power Tree` `Ethernet PHY` `Motor Driver` `MOSFET` `ADC` `DAC` `MIC` `LDO` `Mixed-Signal PCB` `Ground Plane` `Power Plane` `Return Path` `Differential Pair` `Impedance Control` `TVS` `Ferrite Bead` `ESD` `EMI` `Thermal Via` `3D Viewer` `Gerber` `BOM`
 
 ---
 
@@ -429,12 +452,11 @@ STM32-Mixed-Signal-Controller-Board/
 ├─ README.md
 ├─ docs/
 │  ├─ images/
-│  │  ├─ system_block_diagram.png
 │  │  ├─ main_mcu_schematic.png
 │  │  ├─ pcb_layout_final.png
 │  │  └─ board_3d_view.png
-│  ├─ datasheets/
 │  ├─ reports/
+│  ├─ datasheets/
 │  └─ bom/
 ├─ schematic/
 ├─ pcb/
