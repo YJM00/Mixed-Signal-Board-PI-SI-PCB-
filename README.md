@@ -34,7 +34,15 @@
 
 ---
 
-## 전체 설계 흐름
+## 시스템 구성도
+<img width="896" height="739" alt="image" src="https://github.com/user-attachments/assets/e6b512b4-6f4d-46a0-933b-508aa60fc313" />
+
+---
+## 전원 흐름
+<img width="1050" height="759" alt="image" src="https://github.com/user-attachments/assets/c0da8177-1341-4c51-b305-8165a2e5dd81" />
+
+---
+## 설계 흐름
 
 1. Requirement Sheet 분석  
 2. 최종 선정 부품 정리  
@@ -42,10 +50,11 @@
 4. Debugger MCU 설계  
 5. Ethernet PHY 설계  
 6. Motor Driver 설계  
-7. ADC
+7. ADC 설계
 8. DAC / MIC 설계    
-9. SMPS,LDO 설계 
-10. Mixed-Signal PCB Layout 설계  
+9. SMPS,LDO 설계
+10. Main MCU Schematic 설계
+11. Mixed-Signal PCB Layout 설계  
 
 ---
 
@@ -66,9 +75,6 @@
 ---
 
 ## 2. 최종 선정 부품
-
-Requirement를 바탕으로 각 기능 블록에 필요한 주요 부품을 선정했습니다.  
-선정 시에는 데이터시트의 Functional Block Diagram, Electrical Characteristics, Recommended Operating Conditions, Application Circuit 등을 중점적으로 참고했습니다.
 
 ### 부품 선정시 고려 사항
 
