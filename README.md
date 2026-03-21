@@ -111,11 +111,11 @@
   -최대허용 Vds, Vgs, Id 여유를 두어 선택
   -낮은 Rds(ON)저항 선택
   
- **ESD TVS DIODE: ESD3V3D9**
+- **ESD TVS DIODE: ESD3V3D9**
   - 커패시턴스: 고속신호품질 저하방지로 작은 커패시턴스 선정
   - Working Voltage/ Breakdown Voltage
     
- **Ferrite Bead: MPZ1608**
+- **Ferrite Bead: MPZ1608**
   - 임피던스: 차단하고자하는 고주파수대역의 임피던스값 최대
   - Rdc: 발열요소 이므로 최소로
   - 전류 정격: 흐르는 전류보다 여유를 두어 크게
