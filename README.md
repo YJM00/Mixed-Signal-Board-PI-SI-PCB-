@@ -63,34 +63,17 @@
 
 ## 1. Requirement Sheet 분석
 
-프로젝트 초기에 시스템 요구사항을 정리하고, 이를 회로 및 PCB 설계 항목으로 변환하는 과정을 먼저 진행했습니다.
+업체는 PLC제조사로서 센서신호처리 + 모터제어 + 이더넷 기능이 포함된 보드를 요구하였습니다
 
 주요 분석 항목은 다음과 같습니다.
 
-- 메인 제어를 위한 MCU 성능 및 Peripheral 요구사항
-- Debugger MCU 필요 여부 및 디버깅 인터페이스 구성
-- Ethernet 통신 필요 여부
-- Motor 제어 회로 포함 여부
-- ADC / DAC / MIC 등 아날로그 블록 필요 여부
-- 입력 전원 조건 및 전원 레일 구성
-- 보호회로(ESD / EMI / Fuse / TVS) 적용 여부
-- PCB Layer 수 및 Mixed-Signal 보드 구조 방향성
-
-### Requirement 관점에서 정리한 핵심 포인트
-
-- **Digital Block**
-  - STM32 기반 메인 제어
-  - Debugger MCU를 통한 다운로드/디버깅
-- **Communication Block**
-  - Ethernet PHY 기반 유선 통신 확장
-- **Power Block**
-  - 입력 전원에서 여러 전원 레일로 안정적 분배
-- **Actuator Block**
-  - Motor Driver / MOSFET 기반 구동
-- **Analog Block**
-  - ADC / DAC / MIC 인터페이스
-- **PCB Block**
-  - Mixed-Signal 보드로서 전원/접지/리턴패스/노이즈 고려
+- 메인 MCU 성능 및 필요한 Peripheral
+- Debugger MCU 성능 및 디버깅 인터페이스 구성
+- Ethernet PHY 칩 구성
+- ADC / DAC / MIC 인터페이스 구성
+- DC Motor 구동 모터드라이버 2개 구성
+- SMPS, LDO , DC-DC 레귤레이터로 전원레일 구성 
+- EMI / ESD 대응 필요성
 
 ---
 
@@ -99,47 +82,75 @@
 Requirement를 바탕으로 각 기능 블록에 필요한 주요 부품을 선정했습니다.  
 선정 시에는 데이터시트의 Functional Block Diagram, Electrical Characteristics, Recommended Operating Conditions, Application Circuit 등을 중점적으로 참고했습니다.
 
-### 주요 선정 부품 범주
+### 주요 선정 부품 고려 사항
 
-- **Main Controller MCU**
+- **Main Controller MCU: STM32F407**
   - Core 성능
-  - Flash / RAM
-  - Peripheral (UART, SPI, I2C, ADC, DAC, Ethernet 등)
-  - 패키지 / 핀 수 / 확장성
+  - Flash / RAM 용량
+  - Peripheral 개수 (UART, SPI, I2C, ADC, DAC, Ethernet 등)
+  - 입력 전원전압
 
-- **Debugger MCU**
+- **Debugger MCU: STM32F103**
   - SWD / JTAG 기반 디버깅 연결
   - Main MCU 다운로드 및 디버그 지원
-  - 보드 Bring-up 편의성
+  - 메인 컨트롤러보단 저성능 MCU 활용
 
-- **Ethernet PHY**
-  - Link Speed
+- **Ethernet PHY: DP838261RHBR**
+  - MII 프토코콜 기준 통신 속도
   - Main MCU와의 인터페이스 호환성
-  - 주변 수동소자 구성 가능성
 
-- **Motor Driver / MOSFET**
-  - 허용 전류
-  - Switching 특성
-  - Gate Drive 조건
-  - 발열 및 Thermal 대응
+- **UART to USB: CH340C**
+  - PC<->MCU 간 시리얼 디버깅을 위해
+  - UART신호를 USB신호로 변환
 
-- **ADC / DAC / MIC**
-  - Resolution / Sampling
-  - 주파수 응답
-  - 아날로그 신호 품질
+- **ADC:ADS122C04IPW / DAC:CS43L22 / MIC:IMP34DT05**
+  - 요구 Resolution / Sampling Rate 고려
+  - 입력전압, 기준 전압
+  - DNL, SNR 
+    
+- **Motor DriverX2: DRV8701E /MOTOR: Burshed DC-Motor**
+  - 구동 모터 타입에따른 드라이버 선정
+  - 구동 전압, 전류
+ 
+- **MOSFET:DMHT6016LFJ**
+  -4개의 MOSEFET 으로 구성된 H-브리지 회로
+  -최대허용 Vds, Vgs, Id 여유를 두어 선택
+  -낮은 Rds(ON)저항 선택
+  
+ **ESD TVS DIODE: ESD3V3D9**
+  - 커패시턴스: 고속신호품질 저하방지로 작은 커패시턴스 선정
+  - Working Voltage/ Breakdown Voltage
+    
+ **Ferrite Bead: MPZ1608**
+  - 임피던스: 차단하고자하는 고주파수대역의 임피던스값 최대
+  - Rdc: 발열요소 이므로 최소로
+  - 전류 정격: 흐르는 전류보다 여유를 두어 크게
+  - 임피던스-주파수곡선: 낮은주파수대역에서의 임피던스도 고려
 
-- **LDO**
+- **SMPS: RS-100**
+  - 출력 전류/전압: Power Budget을 참고하여 마진을 두어 결정
+  - 효율이 좋은 PS 선정
+  - 보호기능 탑재 여부
+
+- **DeCoupling CAP: MLCC**
   - Dropout Voltage
   - Output Current
   - PSRR
   - Noise / Ripple 특성
 
-- **Protection Components**
-  - TVS Diode
-  - Ferrite Bead
-  - Fuse
-  - ESD / EMI 대응용 부품
+- **Bulk CAP: MHS**
+  - Dropout Voltage
+  - Output Current
+  - PSRR
+  - Noise / Ripple 특성
 
+- **LDO: LD1117**
+  - 권장 입출력 캐패시터 용량/ESR 고려
+  - 전류에따른 Dorp-out 특성 고려
+  - 주파수에따른 PSRR
+  - 발열 P=(VIN-VOUT)I 
+
+***공통적으로 필요한 요구성능에 부합하고 COST를 고려하여 선정하였습니다
 ---
 
 ## 3. Power Budget 및 Power Tree 설계
