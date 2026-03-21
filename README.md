@@ -309,9 +309,6 @@ PCB Artwork 단계에서는 단순 연결이 아니라,
   <img width="832" height="815" alt="image" src="https://github.com/user-attachments/assets/89f1bc82-b259-4760-a914-41cc8bac1c4c" />
 </p>
 
-<p align="center">
-  <sub>Final PCB artwork showing placement, routing, power distribution, and mixed-signal partitioning</sub>
-</p>
 
 ---
 
@@ -321,9 +318,7 @@ PCB Artwork 단계에서는 단순 연결이 아니라,
   <img width="701" height="702" alt="image" src="https://github.com/user-attachments/assets/0655c049-84ff-4f70-9bd2-adc593d9f064" />
 </p>
 
-<p align="center">
-  <sub>3D board view for assembly feasibility, component placement validation, and connector orientation check</sub>
-</p>
+
 
 ---
 
