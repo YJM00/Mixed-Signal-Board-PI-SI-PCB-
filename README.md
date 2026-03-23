@@ -1,4 +1,4 @@
-# STM32 Mixed-Signal Controller Board Design Project
+# MCU Board Design Project
 
 
 ## 프로젝트 개요
