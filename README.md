@@ -106,10 +106,10 @@
   - 구동 모터 타입에따른 드라이버 선정
   - 구동 전압, 전류
  
-   **MOSFET:DMHT6016LFJ**
-  -4개의 MOSEFET 으로 구성된 H-브리지 회로
-  -최대허용 Vds, Vgs, Id 여유를 두어 선택
-  -낮은 Rds(ON)저항 선택
+- **MOSFET:DMHT6016LFJ**
+   - 4개의 MOSEFET 으로 구성된 H-브리지 회로
+   - 최대허용 Vds, Vgs, Id 여유를 두어 선택
+   - 낮은 Rds(ON)저항 선택
   
 - **ESD TVS DIODE: ESD3V3D9**
   - 커패시턴스: 고속신호품질 저하방지로 작은 커패시턴스 선정
