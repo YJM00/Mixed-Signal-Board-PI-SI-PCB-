@@ -113,7 +113,7 @@
   
 - **ESD TVS DIODE: ESD3V3D9**
   - 커패시턴스: 고속신호품질 저하방지로 작은 커패시턴스 선정
-  - Working Voltage/ Breakdown Voltage
+  - Working Voltage/ Breakdown Voltage/ Clamping Voltage
     
 - **Ferrite Bead: MPZ1608**
   - 임피던스: 차단하고자하는 고주파수대역의 임피던스값 최대
