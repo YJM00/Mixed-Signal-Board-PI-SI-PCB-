@@ -127,7 +127,8 @@
   - 보호기능 탑재 여부
 
 - **DeCoupling CAP: MLCC**
-  - 작은 ESL,ESR을 가지도록 
+  - 작은 ESL,ESR을 가지도록
+  - SRF 고려
   - 정격 전압: MLCC는 정격전압 가까이 걸렸을떄 용량이 작아진다
 
 - **Bulk CAP: MHS**
